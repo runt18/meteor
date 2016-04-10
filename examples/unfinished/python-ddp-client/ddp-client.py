@@ -16,7 +16,7 @@ DDP_VERSIONS = ["pre1"]
 
 def log(msg):
     """A shortcut to write to the standard error file descriptor"""
-    sys.stderr.write('{}\n'.format(msg))
+    sys.stderr.write('{0}\n'.format(msg))
 
 
 def parse_command(params):
@@ -63,7 +63,7 @@ class DDPClient(WebSocketClient):
         a simple proof-of-concept client)"""
         message = json.dumps(msg_dict)
         if self.print_raw:
-            log('[RAW] >> {}'.format(message))
+            log('[RAW] >> {0}'.format(message))
         super(DDPClient, self).send(message)
 
         # We don't need to wait for certain messages, just for the ones
@@ -100,7 +100,7 @@ class DDPClient(WebSocketClient):
         """Parse an incoming message and print it. Also update
         self.pending appropriately"""
         if self.print_raw:
-            log('[RAW] << {}'.format(data))
+            log('[RAW] << {0}'.format(data))
 
         msg = json.loads(str(data))
 
@@ -108,7 +108,7 @@ class DDPClient(WebSocketClient):
 
         with self.pending_condition:
             if msg.get('msg') == 'error':
-                log("* ERROR {}".format(msg['reason']))
+                log("* ERROR {0}".format(msg['reason']))
                 # Reset all pending state
                 self.pending = {}
                 changed_pending = True
@@ -117,36 +117,36 @@ class DDPClient(WebSocketClient):
                 log("* CONNECTED")
 
             elif msg.get('msg') == 'failed':
-                log("* FAILED; suggested version {}".format(msg['version']))
+                log("* FAILED; suggested version {0}".format(msg['version']))
 
             elif msg.get('msg') == 'result':
                 if msg['id'] == self.pending.get('id'):
                     if msg.get('result'):
-                        log("* METHOD RESULT {}".format(msg['result']))
+                        log("* METHOD RESULT {0}".format(msg['result']))
                     elif msg.get('error'):
-                        log("* ERROR {}".format(msg['error']['reason']))
+                        log("* ERROR {0}".format(msg['error']['reason']))
                     else:
                         log("* METHOD FINISHED")
                     self.pending.update({'result_acked': True})
                     changed_pending = True
 
             elif msg.get('msg') == 'added':
-                log("* ADDED {} {}".format(
+                log("* ADDED {0} {1}".format(
                         msg['collection'], msg['id']))
                 if 'fields' in msg:
                     for key, value in msg['fields'].items():
-                        log("  - FIELD {} {}".format(key, value))
+                        log("  - FIELD {0} {1}".format(key, value))
             elif msg.get('msg') == 'changed':
-                log("* CHANGED {} {}".format(
+                log("* CHANGED {0} {1}".format(
                         msg['collection'], msg['id']))
                 if 'fields' in msg:
                     for key, value in msg['fields'].items():
-                        log("  - FIELD {} {}".format(key, value))
+                        log("  - FIELD {0} {1}".format(key, value))
                 if 'cleared' in msg:
                     for key in msg['cleared']:
-                        log("  - CLEARED {}".format(key));
+                        log("  - CLEARED {0}".format(key));
             elif msg.get('msg') == 'removed':
-                log("* REMOVED {} {}".format(
+                log("* REMOVED {0} {1}".format(
                         msg['collection'], ", ".join(msg['ids'])))
             elif msg.get('msg') == 'ready':
                 assert 'subs' in msg
@@ -169,7 +169,7 @@ class DDPClient(WebSocketClient):
 
     def closed(self, code, reason=None):
         """Called when the connection is closed"""
-        log('* CONNECTION CLOSED {} {}'.format(code, reason))
+        log('* CONNECTION CLOSED {0} {1}'.format(code, reason))
 
     # Overrides WebSocket to run to ensure that if an unhandled exception is
     # thrown in the thread, we print the exception and *then* kill the main
